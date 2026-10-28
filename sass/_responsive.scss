@@ -133,25 +133,3 @@
     font-size: 26px;
   }
 }
-
-@media screen {
-  @container (max-width: 490px) {
-    .card-pair {
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .card-pair:has(.card:nth-child(2)) > .card {
-      border: 4px solid #262626;
-      border-radius: 12px;
-    }
-
-    .card-pair:has(.selected) {
-      outline: none;
-    }
-
-    .card.selected {
-      outline: 2px solid #9b7355;
-    }
-  }
-}

@@ -387,13 +387,21 @@ output {
 
 .cards {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-content: flex-start;
   gap: 16px;
+  overflow-x: auto;
+  padding: 8px;
 }
 
 .print-page {
-  display: contents;
+  display: grid;
+  grid-template-columns: repeat(3, 63mm);
+  grid-template-rows: repeat(3, 89mm);
+  row-gap: 3mm;
+  column-gap: 0.5mm;
+  width: 190mm;
+  flex-shrink: 0;
 }
 
 .card {
@@ -488,6 +496,14 @@ output {
   margin: 0 0 0.65em;
 }
 
+.description > :first-child {
+  margin-top: 0;
+}
+
+.description > :last-child {
+  margin-bottom: 0;
+}
+
 .description h3, .description h4, .description h5 {
   font-family: inherit;
   font-size: 1em;
@@ -553,7 +569,7 @@ output {
 
 .card-pair {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0;
   max-width: 100%;
   align-items: flex-start;
@@ -578,6 +594,10 @@ output {
 .card-pair:has(.card:nth-child(2)) > .card:nth-child(2) {
   border-radius: 0 12px 12px 0;
   border-left-width: 0;
+}
+
+.card-pair > .card:nth-child(3) {
+  margin-left: 0.5mm;
 }
 
 .card-pair .card.guide::before, .card-pair .card.guide::after {
@@ -708,30 +728,12 @@ output {
     font-size: 26px;
   }
 }
-@media screen {
-  @container (max-width: 490px) {
-    .card-pair {
-      flex-direction: column;
-      gap: 10px;
-    }
-    .card-pair:has(.card:nth-child(2)) > .card {
-      border: 4px solid #262626;
-      border-radius: 12px;
-    }
-    .card-pair:has(.selected) {
-      outline: none;
-    }
-    .card.selected {
-      outline: 2px solid #9b7355;
-    }
-  }
-}
 @page {
   size: A4 portrait;
   margin: 10mm;
 }
 @media print {
-  html, body {
+  :root, body {
     background: white;
     margin: 0;
     padding: 0;
@@ -746,20 +748,25 @@ output {
   .preview {
     padding: 0;
     border: 0;
+    container-type: normal;
   }
   .cards {
     display: block;
+    padding: 0;
+    overflow: visible;
   }
   .print-page {
-    display: grid;
-    grid-template-columns: repeat(3, 63mm);
-    grid-auto-rows: 89mm;
-    gap: 0;
-    width: 189mm;
+    height: 273mm;
     break-after: page;
+    break-inside: avoid;
   }
   .print-page:last-child {
     break-after: auto;
+  }
+  .card-pair {
+    height: 89mm;
+    max-width: none;
+    break-inside: avoid;
   }
   .card {
     margin: 0;
@@ -769,53 +776,19 @@ output {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
-  .card.guide:before, .card.guide:after {
-    inset: -1px;
-    background: linear-gradient(#888, #888) left top/5px 1px no-repeat, linear-gradient(#888, #888) left top/1px 5px no-repeat, linear-gradient(#888, #888) right bottom/5px 1px no-repeat, linear-gradient(#888, #888) right bottom/1px 5px no-repeat;
-  }
   .description {
     overflow: hidden;
   }
   .empty-preview {
     display: none;
   }
-}
-@media print {
-  .print-page {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    width: 126mm;
-    height: 267mm;
-    align-items: flex-start;
-  }
-  .card-pair {
-    flex-wrap: nowrap;
-    width: 126mm;
-    height: 89mm;
-    max-width: none;
-    flex-shrink: 0;
-    break-inside: avoid;
-  }
-  .card {
-    flex-shrink: 0;
-  }
-  .card-pair:has(.card:only-child)::after {
-    content: "";
-    display: block;
-    width: 63mm;
-    height: 89mm;
-  }
-}
-@media print {
-  .preview {
-    container-type: normal;
-  }
   .card-pair:has(.selected) {
     outline: none;
   }
   .card-pair:has(.guide)::before, .card-pair:has(.guide)::after {
     inset: -1px;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 }
 

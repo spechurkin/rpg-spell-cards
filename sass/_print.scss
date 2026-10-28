@@ -6,7 +6,7 @@
 }
 
 @media print {
-  html, body {
+  :root, body {
     background: white;
     margin: 0;
     padding: 0;
@@ -24,23 +24,29 @@
   .preview {
     padding: 0;
     border: 0;
+    container-type: normal;
   }
 
   .cards {
     display: block;
+    padding: 0;
+    overflow: visible;
   }
 
   .print-page {
-    display: grid;
-    grid-template-columns:repeat(3, dimensions.$card-width);
-    grid-auto-rows: dimensions.$card-height;
-    gap: 0;
-    width: dimensions.$card-width * 3;
+    height: dimensions.$sheet-height;
     break-after: page;
+    break-inside: avoid;
   }
 
   .print-page:last-child {
     break-after: auto;
+  }
+
+  .card-pair {
+    height: dimensions.$card-height;
+    max-width: none;
+    break-inside: avoid;
   }
 
   .card {
@@ -52,54 +58,12 @@
     -webkit-print-color-adjust: exact;
   }
 
-  .card.guide:before, .card.guide:after {
-    inset: -1px;
-    background: linear-gradient(#888, #888) left top/5px 1px no-repeat, linear-gradient(#888, #888) left top/1px 5px no-repeat, linear-gradient(#888, #888) right bottom/5px 1px no-repeat, linear-gradient(#888, #888) right bottom/1px 5px no-repeat;
-  }
-
   .description {
     overflow: hidden;
   }
 
   .empty-preview {
     display: none;
-  }
-}
-
-@media print {
-  .print-page {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    width: dimensions.$pair-width;
-    height: dimensions.$sheet-height;
-    align-items: flex-start;
-  }
-
-  .card-pair {
-    flex-wrap: nowrap;
-    width: dimensions.$pair-width;
-    height: dimensions.$card-height;
-    max-width: none;
-    flex-shrink: 0;
-    break-inside: avoid;
-  }
-
-  .card {
-    flex-shrink: 0;
-  }
-
-  .card-pair:has(.card:only-child)::after {
-    content: '';
-    display: block;
-    width: dimensions.$card-width;
-    height: dimensions.$card-height;
-  }
-}
-
-@media print {
-  .preview {
-    container-type: normal;
   }
 
   .card-pair:has(.selected) {
@@ -108,5 +72,8 @@
 
   .card-pair:has(.guide)::before, .card-pair:has(.guide)::after {
     inset: -1px;
+    // Firefox otherwise replaces these transparent gradients with an opaque white layer.
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 }

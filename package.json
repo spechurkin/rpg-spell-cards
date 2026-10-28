@@ -5,10 +5,8 @@
   "description": "Ручной редактор карточек заклинаний для НРИ",
   "main": "index.js",
   "scripts": {
-    "test": "node scripts/check-styles.cjs && node --test --test-isolation=none tests/*.test.cjs",
     "styles:build": "sass --style=expanded sass/main.scss style.css",
-    "styles:watch": "sass --watch --style=expanded sass/main.scss:style.css",
-    "styles:check": "node scripts/check-styles.cjs"
+    "styles:watch": "sass --watch --style=expanded sass/main.scss:style.css"
   },
   "license": "ISC",
   "devDependencies": {

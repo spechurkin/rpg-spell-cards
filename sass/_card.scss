@@ -2,13 +2,21 @@
 
 .cards {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-content: flex-start;
   gap: 16px;
+  overflow-x: auto;
+  padding: 8px;
 }
 
 .print-page {
-  display: contents;
+  display: grid;
+  grid-template-columns: repeat(3, dimensions.$card-width);
+  grid-template-rows: repeat(3, dimensions.$card-height);
+  row-gap: dimensions.$row-gap;
+  column-gap: dimensions.$column-gap;
+  width: dimensions.$sheet-width;
+  flex-shrink: 0;
 }
 
 .card {
@@ -103,6 +111,14 @@
   margin: 0 0 .65em;
 }
 
+.description > :first-child {
+  margin-top: 0;
+}
+
+.description > :last-child {
+  margin-bottom: 0;
+}
+
 .description h3, .description h4, .description h5 {
   font-family: inherit;
   font-size: 1em;
@@ -168,7 +184,7 @@
 
 .card-pair {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0;
   max-width: 100%;
   align-items: flex-start;
@@ -193,6 +209,10 @@
 .card-pair:has(.card:nth-child(2)) > .card:nth-child(2) {
   border-radius: 0 12px 12px 0;
   border-left-width: 0;
+}
+
+.card-pair > .card:nth-child(3) {
+  margin-left: dimensions.$column-gap;
 }
 
 .card-pair .card.guide::before, .card-pair .card.guide::after {

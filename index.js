@@ -22,7 +22,7 @@ function validateDeck(data) {
         for (const field of fields) {
             const limit = field === 'description' ? 30000 : field === 'components' ? 300 : field === 'level' ? 20 : 180;
             if (typeof spell[field] !== 'string' || spell[field].length > limit) throw new Error('Некорректное поле: ' + field + '.');
-            result[field] = spell[field];
+            result[field] = spell[field].trim();
         }
         if (typeof spell.fontSize !== 'number' || !Number.isFinite(spell.fontSize) || spell.fontSize < 8 || spell.fontSize > 16) throw new Error('Размер текста должен быть от 8 до 16 px.');
         result.fontSize = spell.fontSize;
@@ -82,7 +82,15 @@ if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded
         }
         const pairs = [];
         spells.forEach(spell => {
+            let pair, partCount = 0;
             const makeCard = (continuation = false) => {
+                if (partCount % 3 === 0) {
+                    pair = document.createElement('div');
+                    pair.className = 'card-pair';
+                    cards.append(pair);
+                    pairs.push(pair);
+                }
+                partCount++;
                 const card = document.createElement('article');
                 card.className = 'card' + (spell.id === selected ? ' selected' : '') + ($('guides').checked ? ' guide' : '');
                 card.dataset.id = spell.id;
@@ -100,25 +108,21 @@ if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded
                     card.innerHTML = '<div class="description"></div><footer class="card-footer"></footer>';
                 }
                 card.querySelector('.card-footer').insertAdjacentHTML('beforeend', '<div class="card-pagination"></div>');
-                cards.append(card);
+                pair.append(card);
                 return card;
             };
-            const parts = paginateDescription(makeCard(), render(spell.description), () => makeCard(true));
-            for (let i = 0; i < parts.length; i += 2) {
-                const pair = document.createElement('div');
-                pair.className = 'card-pair';
-                parts.slice(i, i + 2).forEach(part => pair.append(part));
-                pairs.push(pair);
-            }
+            paginateDescription(makeCard(), render(spell.description), () => makeCard(true));
         });
-        let page;
-        pairs.forEach((pair, index) => {
-            if (index % 3 === 0) {
-                page = document.createElement('div');
-                page.className = 'print-page';
-                cards.append(page);
-            }
-            page.append(pair);
+        pairs.filter(pair => !pair.children.length).forEach(pair => pair.remove());
+        packCardPairs(pairs.filter(pair => pair.children.length)).forEach(items => {
+            const page = document.createElement('div');
+            page.className = 'print-page';
+            items.forEach(({pair, row, column, width}) => {
+                pair.style.gridRow = row;
+                pair.style.gridColumn = column + ' / span ' + width;
+                page.append(pair);
+            });
+            cards.append(page);
         });
         cancelAnimationFrame(frame);
         frame = requestAnimationFrame(checkOverflow);
@@ -127,14 +131,12 @@ if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded
     function checkOverflow() {
         const overflowing = [];
         cards.querySelectorAll('.card').forEach(card => {
-            const text = card.querySelector('.description');
-            const footer = card.querySelector('.card-footer');
-            const overflow = text.scrollHeight > text.clientHeight + 1 || footer.getBoundingClientRect().bottom > card.getBoundingClientRect().bottom - 4;
+            const overflow = !cardFits(card);
             card.classList.toggle('overflow', overflow);
             if (overflow) overflowing.push(spells.find(spell => spell.id === card.dataset.id)?.name || 'Без названия');
         });
         $('overflow-warning').hidden = !overflowing.length;
-        $('overflow-warning').textContent = 'Характеристики занимают слишком много места: ' + [...new Set(overflowing)].join(', ') + '. Сократите название, характеристики или компоненты, чтобы осталось место для описания.';
+        $('overflow-warning').textContent = 'Текст выходит за допустимую область карточки: ' + [...new Set(overflowing)].join(', ') + '. Сократите название, характеристики или компоненты либо уменьшите размер текста.';
         return overflowing.length;
     }
 
@@ -170,11 +172,37 @@ if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded
     form.addEventListener('input', event => {
         const spell = current(), key = event.target.name;
         if (!spell || ![...fields, 'fontSize'].includes(key)) return;
-        spell[key] = key === 'fontSize' ? Number(event.target.value) : event.target.value;
+        if (fields.includes(key) && !event.isComposing) {
+            const field = event.target, value = field.value.trimStart();
+            if (value !== field.value) {
+                const removed = field.value.length - value.length;
+                const start = field.selectionStart, end = field.selectionEnd, direction = field.selectionDirection;
+                field.value = value;
+                field.setSelectionRange(Math.max(0, start - removed), Math.max(0, end - removed), direction);
+            }
+        }
+        spell[key] = key === 'fontSize' ? Number(event.target.value) : event.target.value.trim();
         $('font-value').value = spell.fontSize + ' px';
         drawList();
         drawCards();
         save();
+    });
+    form.addEventListener('paste', event => {
+        const field = event.target;
+        if (!fields.includes(field.name) || !event.clipboardData) return;
+        event.preventDefault();
+        const text = event.clipboardData.getData('text/plain').trim();
+        const start = field.selectionStart, end = field.selectionEnd;
+        const available = field.maxLength < 0 ? text.length : Math.max(0, field.maxLength - field.value.length + end - start);
+        const inserted = text.slice(0, available);
+        if (!document.execCommand('insertText', false, inserted)) field.setRangeText(inserted, start, end, 'end');
+        field.dispatchEvent(new Event('input', {bubbles: true}));
+    });
+    form.addEventListener('focusout', event => {
+        const field = event.target;
+        if (!fields.includes(field.name) || field.value === field.value.trim()) return;
+        field.value = field.value.trim();
+        field.dispatchEvent(new Event('input', {bubbles: true}));
     });
     $('description').maxLength = 30000;
     $('description').addEventListener('keydown', event => {
