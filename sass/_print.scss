@@ -1,10 +1,112 @@
+@use "dimensions";
+
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+
 @media print {
-  body {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+  html, body {
+    background: white;
+    margin: 0;
+    padding: 0;
   }
 
-  h1, .buttons {
+  .site-header, .library, .editor, .preview-heading, .preview-note, .warning, .message, dialog {
+    display: none !important;
+  }
+
+  .workspace {
+    display: block;
+    min-height: 0;
+  }
+
+  .preview {
+    padding: 0;
+    border: 0;
+  }
+
+  .cards {
+    display: block;
+  }
+
+  .print-page {
+    display: grid;
+    grid-template-columns:repeat(3, dimensions.$card-width);
+    grid-auto-rows: dimensions.$card-height;
+    gap: 0;
+    width: dimensions.$card-width * 3;
+    break-after: page;
+  }
+
+  .print-page:last-child {
+    break-after: auto;
+  }
+
+  .card {
+    margin: 0;
+    box-shadow: none !important;
+    border-color: #262626 !important;
+    cursor: default;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .card.guide:before, .card.guide:after {
+    inset: -1px;
+    background: linear-gradient(#888, #888) left top/5px 1px no-repeat, linear-gradient(#888, #888) left top/1px 5px no-repeat, linear-gradient(#888, #888) right bottom/5px 1px no-repeat, linear-gradient(#888, #888) right bottom/1px 5px no-repeat;
+  }
+
+  .description {
+    overflow: hidden;
+  }
+
+  .empty-preview {
     display: none;
+  }
+}
+
+@media print {
+  .print-page {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: dimensions.$pair-width;
+    height: dimensions.$sheet-height;
+    align-items: flex-start;
+  }
+
+  .card-pair {
+    flex-wrap: nowrap;
+    width: dimensions.$pair-width;
+    height: dimensions.$card-height;
+    max-width: none;
+    flex-shrink: 0;
+    break-inside: avoid;
+  }
+
+  .card {
+    flex-shrink: 0;
+  }
+
+  .card-pair:has(.card:only-child)::after {
+    content: '';
+    display: block;
+    width: dimensions.$card-width;
+    height: dimensions.$card-height;
+  }
+}
+
+@media print {
+  .preview {
+    container-type: normal;
+  }
+
+  .card-pair:has(.selected) {
+    outline: none;
+  }
+
+  .card-pair:has(.guide)::before, .card-pair:has(.guide)::after {
+    inset: -1px;
   }
 }

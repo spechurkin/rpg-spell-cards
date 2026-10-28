@@ -1,88 +1,98 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Cards</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <link rel="stylesheet" type="text/css" href="normalize.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet">
-  <script src="index.js"></script>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    <meta content="#f4f1eb" name="theme-color">
+    <title>Карточки заклинаний</title>
+    <meta content="Ручной редактор карточек заклинаний с разметкой текста и печатью на A4." name="description">
+    <link href="style.css" rel="stylesheet">
+    <script defer src="enriched-text.js"></script>
+    <script defer src="pagination.js"></script>
+    <script defer src="index.js"></script>
 </head>
 <body>
-<div class="container">
-  <h1>Генератор карточек заклинаний для Starfinder НРИ</h1>
-  <div class="cards">
-    <div class="card-wrapper">
-      <div class="card card--front">
-        <div class="card__content">
-          <div class="card__content-header">
-            <h2 class="card__content-title js-editable">
-              Перенос заряда
-            </h2>
-            <h3 class="card__content-lvl">
-              <span class="js-editable">0</span> круг
-            </h3>
-            <h4 class="card__content-caster js-editable">
-              Техномант
-            </h4>
-            <div class="card__content-separator"></div>
-          </div>
-          <div class="card__content-body">
-            <p class="card__content-item">
-              Школа:
-              <span class="js-editable">Превращение</span>
-            </p>
-            <p class="card__content-item">
-              Время сотворения:
-              <span class="js-editable">1 осн. действие</span>
-            </p>
-            <p class="card__content-item">
-              Дистанция:
-              <span class="js-editable">касание</span>
-            </p>
-            <p class="card__content-item">
-              Цель:
-              <span class="js-editable">2 однотип. предмета</span>
-            </p>
-            <p class="card__content-item">
-              Длительность:
-              <span class="js-editable">мгновенная</span>
-            </p>
-            <p class="card__content-item">
-              Испытание:
-              <span class="js-editable">Стойкости отменяет (предмет)</span>
-            </p>
-            <p class="card__content-item">
-              Устойчивость к магии:
-              <span class="js-editable">Да (предмет)</span>
-            </p>
-          </div>
-        </div>
-      
-      </div>
-      <div class="card card--back">
-        <div class="card__content">
-          <div class="card__content-body">
-            <p class="card__content-description js-editable">
-              Вы можете перенести любое количество зарядов из одного аккумулятора в другой или из одной энергоячейки в другую. Заряды переносятся только между двумя однотипными предметами (двумя аккумуляторами одной емкости, двумя одинаковыми энергоячейками и т.д.): вы разряжаете один предмет, заряжая другой.
-              
-              Перед сотворением заклинания вы должны указать, сколько зарядов собираетесь переносить. Если заряжаемый предмет неспособен вместить выбранное количество зарядов, он должен пройти испытание Стойкости и при провале получит 1d6 урона электричеством. Заклинание не позволяет определить, насколько разряжен заряжаемый предмет, но вы всегда можете перенести меньше зарядов, чтобы минимизировать риски.
-            </p>
-          </div>
-        </div>
-      </div>
+<header class="site-header">
+    <div><h1>Карточки заклинаний</h1><a href="https://reverzz.github.io/starfinder-cards/" rel="noopener noreferrer"
+                                        target="_blank">На основе Starfinder Cards</a></div>
+    <div class="deck-actions">
+        <button id="import">Открыть колоду</button>
+        <button id="export">Скачать JSON</button>
+        <button class="primary" id="print">Печатать / PDF</button>
     </div>
-  </div>
-  <div class="buttons">
-    <button type="button" class="button js-edit-button" value="edit">Редактировать карточки</button>
-    <button type="button" class="button js-text-button">Подогнать описание заклинания</button>
-    <button type="button" class="button js-copy-button">Добавить карточку</button>
-  </div>
-</div>
+    <input accept="application/json,.json" hidden id="import-file" type="file"></header>
+<main class="workspace">
+    <aside aria-label="Колода" class="library">
+        <div class="section-heading"><h2>Колода <span id="count"></span></h2>
+            <button aria-label="Добавить заклинание" class="small" id="add">+</button>
+        </div>
+        <div class="spell-list" id="spell-list"></div>
+        <p class="save-status" id="save-status" role="status">Изменения сохраняются в этом браузере.</p></aside>
+    <section aria-labelledby="editor-heading" class="editor">
+        <div class="section-heading"><h2 id="editor-heading">Заклинание</h2>
+            <div>
+                <button class="small" id="duplicate">Копия</button>
+                <button class="small danger" id="delete">Удалить</button>
+            </div>
+        </div>
+        <form autocomplete="off" id="spell-form">
+            <div class="title-fields"><label>Уровень<input maxlength="20" name="level" placeholder="0"
+                                                           type="text"></label><label>Название<input maxlength="180"
+                                                                                                     name="name"
+                                                                                                     placeholder="Название заклинания"
+                                                                                                     type="text"></label>
+            </div>
+            <label>Действие<input maxlength="180" name="action"
+                                  placeholder="1 основное действие"
+                                  type="text"></label>
+            <div class="field-pair"><label>Дистанция<input maxlength="180" name="range" placeholder="Касание"
+                                                           type="text"></label><label>Длительность<input
+                    maxlength="180" name="duration" placeholder="Мгновенная" type="text"></label></div>
+            <label>Школа магии <span class="optional">необязательно</span><input maxlength="180" name="school"
+                                                                                 placeholder="Превращение"
+                                                                                 type="text"></label>
+            <label>Компоненты <span class="optional">необязательно</span><input maxlength="300" name="components"
+                                                                                placeholder="В, С, М (описание материала)"
+                                                                                type="text"></label>
+            <label for="description">Описание</label><textarea id="description" name="description"
+                                                               placeholder="Введите описание. **Жирный**, *курсив*, ~~зачёркнутый~~…"
+                                                               rows="12"
+                                                               spellcheck="true"></textarea>
+            <details class="format-help">
+                <summary>Разметка и горячие клавиши</summary>
+                <p><code>**жирный**</code> · Ctrl/⌘ B<br><code>*курсив*</code> или <code>_курсив_</code> · Ctrl/⌘
+                    I<br><code>__подчёркнутый__</code> · Ctrl/⌘ U<br><code>~~зачёркнутый~~</code> или <code>~зачёркнутый~</code>
+                    · Ctrl/⌘ Shift X<br><code>`код`</code> · Ctrl/⌘ E<br><code>[текст](https://…)</code> · Ctrl/⌘ K</p>
+                <p>Также: заголовки <code>##</code>, списки <code>-</code> и <code>1.</code>, цитаты <code>&gt;</code>,
+                    разделитель <code>---</code>. Пустая строка начинает абзац. HTML выводится как текст.</p></details>
+            <label class="font-setting" for="font-size">Размер текста
+                <output for="font-size" id="font-value"></output>
+                <input id="font-size" max="16" min="8" name="fontSize" step="0.5" type="range"></label>
+        </form>
+        <div hidden id="empty-editor"><p>Колода пуста. Добавьте заклинание, чтобы заполнить карточку.</p>
+            <button class="primary" id="empty-add">Добавить заклинание</button>
+        </div>
+    </section>
+    <section aria-labelledby="preview-heading" class="preview">
+        <div class="preview-heading">
+            <div><h2 id="preview-heading">Лист карточек</h2>
+                <p>63 × 89 мм · A4 · 3 пары на листе</p></div>
+            <label class="guides-toggle"><input checked id="guides" type="checkbox"> Линии реза</label></div>
+        <p class="warning" hidden id="overflow-warning" role="status"></p>
+        <div class="cards" id="cards"></div>
+        <p class="preview-note">Для печати выберите A4, масштаб 100% и отключите колонтитулы браузера. Нажмите на
+            карточку, чтобы её редактировать.</p></section>
+</main>
+<div class="message" hidden id="message" role="status"></div>
+<dialog id="delete-dialog">
+    <form method="dialog"><h2>Удалить заклинание?</h2>
+        <p id="delete-name"></p>
+        <div class="dialog-actions">
+            <button value="cancel">Отмена</button>
+            <button class="danger" value="delete">Удалить</button>
+        </div>
+    </form>
+</dialog>
 </body>
 </html>
-
 

@@ -1,0 +1,90 @@
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+input[type=text], textarea {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  border: 1px solid #bdb8af;
+  border-radius: 4px;
+  background: white;
+  padding: 10px 11px;
+  color: #252522;
+  min-height: 42px;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #77736b;
+}
+
+textarea {
+  resize: vertical;
+  line-height: 1.55;
+  font-size: 13px;
+  min-height: 210px;
+}
+
+#spell-form > label, #spell-form > .field-pair, #spell-form > .title-fields {
+  margin-bottom: 16px;
+}
+
+.title-fields {
+  display: grid;
+  grid-template-columns:64px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.field-pair {
+  display: grid;
+  grid-template-columns:1fr 1fr;
+  gap: 12px;
+}
+
+.optional {
+  font-weight: normal;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.format-help {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin: 10px 0 24px;
+}
+
+.format-help summary {
+  cursor: pointer;
+  min-height: 30px;
+}
+
+.format-help p {
+  margin: 8px 0;
+}
+
+.format-help code {
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.font-setting {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.font-setting input {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+output {
+  margin-left: auto;
+  font-weight: normal;
+  color: var(--muted);
+}

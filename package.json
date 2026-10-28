@@ -1,11 +1,17 @@
 {
-  "name": "cards",
-  "version": "1.0.0",
-  "description": "",
+  "name": "rpg-spell-cards",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Ручной редактор карточек заклинаний для НРИ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node scripts/check-styles.cjs && node --test --test-isolation=none tests/*.test.cjs",
+    "styles:build": "sass --style=expanded sass/main.scss style.css",
+    "styles:watch": "sass --watch --style=expanded sass/main.scss:style.css",
+    "styles:check": "node scripts/check-styles.cjs"
   },
-  "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "sass": "1.106.1"
+  }
 }
